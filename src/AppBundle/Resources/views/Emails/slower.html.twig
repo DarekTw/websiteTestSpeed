@@ -1,0 +1,28 @@
+<p>Website tested: {{ benchmark.getWebsite() }}</p>
+<p><strong>Slow!</strong> Tested website is loaded slower than at least one of the competitors.</p>
+
+<hr />
+<p>Websites to compare:</p>
+<table>
+    <thead>
+        <tr>
+            <th>Website url</th>
+            <th>Loading time</th>
+            <th>Time difference</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cm in benchmark.getCompetitors() %}
+            <tr>
+                <td>{{ cm.getDomain() }}</td>
+                {% if cm.getError() %}
+                    <td colspan="2">{{ cm.getError() }}</td>
+                {% else %}
+                    <td>{{ cm.getTime() }} s.</td>
+                    <td>{{ cm.getTime() - benchmark.getWebsite().getTime() }} s.</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+           

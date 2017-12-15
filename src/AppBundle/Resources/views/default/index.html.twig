@@ -1,0 +1,121 @@
+{% extends 'AppBundle::base.html.twig' %}
+
+{% block body %}
+
+    {# RESULTS #}
+    {% if showResults %}
+        <div id="results-wrapper">
+            <h2>Results:</h2>
+            <p>Website tested: {{ benchmark.getWebsite() }}</p>
+                
+            {% if benchmark.isSlowerTwoTimes() %}
+                <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <strong>Very slow!</strong> Tested website is loaded twice as slow as at least one of the competitors.
+                </div>
+            {% elseif benchmark.isSlower() %}
+                <div class="alert alert-warning alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <strong>Slow!</strong> Tested website is loaded slower than at least one of the competitors.
+                </div>
+            {% endif %}
+            
+            <hr />
+            <p>Websites to compare:</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Website url</th>
+                        <th>Loading time</th>
+                        <th>Time difference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cm in benchmark.getCompetitors() %}
+                        <tr>
+                            <td>{{ cm.getDomain() }}</td>
+                            {% if cm.getError() %}
+                                <td colspan="2">{{ cm.getError() }}</td>
+                            {% else %}
+                                <td>{{ cm.getTime() }} s.</td>
+                                <td>{{ cm.getTime() - benchmark.getWebsite().getTime() }} s.</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            
+        </div>
+                
+        <button class="btn btn-default" id="show-form">Show form</button>
+    {% endif %}
+    
+    {# FORM #}
+    <div id="form-wrapper" class="{{ showResults ? 'hidden' : '' }}">
+        <h2>Form:</h2>
+
+        {{ form_start(form) }}
+
+        {{ form_row(form.website) }}
+
+        <p>Website competitors:</p>
+        <ul id="website-competitors"
+            data-prototype="{{ form_widget(form.competitors.vars.prototype)|e }}">
+            {% for websiteField in form.competitors %}
+                <li>
+                    {{ form_row(websiteField) }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <button class="btn btn-default pull-left" id="add-another-website">Add another website</button>
+        <button class="btn btn-primary pull-right" type="submit">Submit</button>
+        <div class="clearfix"></div>
+
+        <div class="hidden">
+            {{ form_rest(form) }}
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var websiteCount = '{{ form.competitors|length }}';
+
+        $(document).ready(function () {
+            var websiteCompetitors = $('#website-competitors');
+            websiteCompetitors.find('li').each(function () {
+                addWebsiteDeleteLink($(this));
+            });
+
+            $('#add-another-website').click(function (e) {
+                e.preventDefault();
+                var newWidget = websiteCompetitors.attr('data-prototype');
+                newWidget = newWidget.replace(/__name__/g, ++websiteCount);
+                var newLi = $('<li></li>').html(newWidget);
+                newLi.appendTo(websiteCompetitors);
+                addWebsiteDeleteLink(newLi);
+            });
+
+            $('#show-form').click(function (e) {
+                e.preventDefault();
+                $("#form-wrapper").removeClass('hidden');
+            });
+        });
+
+        function addWebsiteDeleteLink(li) {
+            var removeFormA = $('<a href="#">delete this</a>');
+            li.append(removeFormA);
+
+            removeFormA.on('click', function (e) {
+                e.preventDefault();
+                li.remove();
+            });
+        }
+    </script>
+{% endblock %}

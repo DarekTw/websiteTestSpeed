@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}XSOLVE - recruitment task{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+<body>
+
+    <div id="wrapper">
+        <div class="container" id="container">
+            <div id="welcome">
+                <h1><span>Welcome to</span> XSOLVE website time loading benchmark</h1>
+            </div>
+        {% block body %}{% endblock %}
+    </div>
+</div>
+
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
+</body>
+</html>
