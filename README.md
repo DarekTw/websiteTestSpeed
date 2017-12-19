@@ -42,11 +42,11 @@ The main function in this service is benchmark(), it calls benchmark() function 
 * Resorces
 
 src: src/AppBundle/Resorces/views/default/index.html.twig
-It is twig template for WebisteForm which handles fomr's collection by javawasript functions.
+It is twig template for WebisteForm which handles fomr's collection by javasript functions.
 This twig temaplete uses bootstrap.css and jquery.js hosting in cdn.
 
 src: src/AppBundle/Resorces/views/Emails/slower.html.twig
-It is email temple which presents information abuot slow website.
+It is email temple which presents information about slow website.
 
 * Tests
 
