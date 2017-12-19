@@ -1,72 +1,61 @@
-Symfony Standard Edition
-========================
+RECRUITMENT TASK XSOLVE
+=======================
 
-Welcome to the Symfony Standard Edition - a fully-functional Symfony
-application that you can use as the skeleton for your new applications.
+This is PHP app written in symfony framework 3.3 and PHP 5.6.
+The main goeal is benchmark loading time of the website in comparison to the other websites.
 
-For details on how to download and get started with Symfony, see the
-[Installation][1] chapter of the Symfony Documentation.
+Installation
+------------
+
+  * Download or clone with git this project and install it like any other [Symfony application][1]
+
+  * Configure email client in app/config/config.yml file
+
+  * Run local webserwer from console command php bin/console server:start and check http://127.0.0.1:8000
+
 
 What's inside?
 --------------
 
-The Symfony Standard Edition is configured with the following defaults:
+* Controler
 
-  * An AppBundle you can use to start coding;
+src: src/AppBundle/Controler/DefaultControler.php
+It controls requests for website simple form, call BenchamrkService if form is send, and return results.
 
-  * Twig as the only configured template engine;
+* Form
 
-  * Doctrine ORM/DBAL;
+src: src/AppBundle/Form/WebisteForm.php
+It is form with website ulr and website competitors as collection field.
 
-  * Swiftmailer;
+* Model
 
-  * Annotations enabled for everything.
+src: src/AppBundle/Model/Webiste.php
+It is model of website with domain time and error values.
+This class also has benchmark() method, which checks loading time if website is set, by file_get_contents function.
 
-It comes pre-configured with the following bundles:
+* Service
 
-  * **FrameworkBundle** - The core Symfony framework bundle
+src: src/AppBundle/Service/BenchmarkService.php
+It is service which handles benchmark of each website send by a WebisteForm. It also sends an email if a website is loading slow.
+The main function in this service is benchmark(), it calls benchmark() function on each Website and sorts results with compareWebsites() static function.
 
-  * [**SensioFrameworkExtraBundle**][6] - Adds several enhancements, including
-    template and routing annotation capability
+* Resorces
 
-  * [**DoctrineBundle**][7] - Adds support for the Doctrine ORM
+src: src/AppBundle/Resorces/views/default/index.html.twig
+It is twig template for WebisteForm which handles fomr's collection by javawasript functions.
+This twig temaplete uses bootstrap.css and jquery.js hosting in cdn.
 
-  * [**TwigBundle**][8] - Adds support for the Twig templating engine
+src: src/AppBundle/Resorces/views/Emails/slower.html.twig
+It is email temple which presents information abuot slow website.
 
-  * [**SecurityBundle**][9] - Adds security by integrating Symfony's security
-    component
+* Tests
 
-  * [**SwiftmailerBundle**][10] - Adds support for Swiftmailer, a library for
-    sending emails
+src: tests/AppBundle/Controller/DefaultControllerTest.php
 
-  * [**MonologBundle**][11] - Adds support for Monolog, a logging library
-
-  * **WebProfilerBundle** (in dev/test env) - Adds profiling functionality and
-    the web debug toolbar
-
-  * **SensioDistributionBundle** (in dev/test env) - Adds functionality for
-    configuring and working with Symfony distributions
-
-  * [**SensioGeneratorBundle**][13] (in dev env) - Adds code generation
-    capabilities
-
-  * [**WebServerBundle**][14] (in dev env) - Adds commands for running applications
-    using the PHP built-in web server
-
-  * **DebugBundle** (in dev/test env) - Adds Debug and VarDumper component
-    integration
-
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
+It is simple WebTestCase class with 2 funcional tests testIndex() and testSubmit().
+It tests if site is working correctly and form is returning correct data.
 
 Enjoy!
 
 [1]:  https://symfony.com/doc/3.3/setup.html
-[6]:  https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/index.html
-[7]:  https://symfony.com/doc/3.3/doctrine.html
-[8]:  https://symfony.com/doc/3.3/templating.html
-[9]:  https://symfony.com/doc/3.3/security.html
-[10]: https://symfony.com/doc/3.3/email.html
-[11]: https://symfony.com/doc/3.3/logging.html
-[13]: https://symfony.com/doc/current/bundles/SensioGeneratorBundle/index.html
-[14]: https://symfony.com/doc/current/setup/built_in_web_server.html
+

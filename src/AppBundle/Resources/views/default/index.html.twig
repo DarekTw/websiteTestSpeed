@@ -6,7 +6,7 @@
     {% if showResults %}
         <div id="results-wrapper">
             <h2>Results:</h2>
-            <p>Website tested: {{ benchmark.getWebsite() }}</p>
+            <p id="website-info">Website tested: {{ benchmark.getWebsite() }}</p>
                 
             {% if benchmark.isSlowerTwoTimes() %}
                 <div class="alert alert-danger alert-dismissible fade in" role="alert">

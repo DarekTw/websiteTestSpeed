@@ -13,33 +13,23 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('Welcome to Symfony', $crawler->filter('#container h1')->text());
+        $this->assertContains('Welcome to XSOLVE website time loading benchmark', $crawler->filter('#container h1')->text());
     }
+
+    public function testSubmit()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/');
+        $form = $crawler->selectButton('Submit')->form();
+        
+        // set some values
+        $form['website_form[website]'] = 'https://xsolve.software/';
+
+        // submit the form
+        $crawler = $client->submit($form);
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertRegExp('/Website tested: https:\/\/xsolve.software\/ : [\d]+\.[\d]+s\./', $crawler->filter('#website-info')->text());
+    }
+
 }
-
-// test service
-/*
- * check is valid domain exception
- * check test domain function | return time or exception 
- * chcek test domains function | 
-*/
-
-/*
- * class domain
- * var domain name
- * var load time
- * function test speed
- * 
- * service domainSpeedCoparator
- * var main domain
- * array od domain competitors
- * function compare
- * displayText result
- * dsplayHtml result
- * 
- * class Exception
- * 
- * class SMSAPI
- * function send Sms
- * 
- */
