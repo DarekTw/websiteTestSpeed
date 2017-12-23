@@ -29,9 +29,18 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
-    # add more services, or override services that need manual wiring
+    # benchamerk
     AppBundle\Service\BenchmarkService:
         public: true
-        arguments: ['@mailer','@logger', '@templating']
         tags:
             - { name: monolog.logger, channel: benchmark }
+            
+    # alias
+    AppBundle\Service\BenchmarkInterface: '@AppBundle\Service\BenchmarkService'
+
+    # mailer
+    AppBundle\Service\MailerService:
+        public: true
+        
+    # alias
+    AppBundle\Service\MailerInterface: '@AppBundle\Service\MailerService'

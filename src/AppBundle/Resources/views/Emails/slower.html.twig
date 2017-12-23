@@ -15,11 +15,11 @@
         {% for cm in benchmark.getCompetitors() %}
             <tr>
                 <td>{{ cm.getDomain() }}</td>
-                {% if cm.getError() %}
-                    <td colspan="2">{{ cm.getError() }}</td>
+                {% if cm.getTime() is null %}
+                    <td colspan="2">The specified domain can not be examined, please check the correctness of the address.</td>
                 {% else %}
-                    <td>{{ cm.getTime() }} s.</td>
-                    <td>{{ cm.getTime() - benchmark.getWebsite().getTime() }} s.</td>
+                    <td>{{ cm.getTime() }} ms</td>
+                    <td>{{ cm.getTime() - benchmark.getWebsite().getTime() }} ms</td>
                 {% endif %}
             </tr>
         {% endfor %}

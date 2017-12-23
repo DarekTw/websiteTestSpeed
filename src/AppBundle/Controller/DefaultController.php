@@ -3,10 +3,10 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Form\WebsiteForm;
+use AppBundle\Service\BenchmarkInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Service\BenchmarkService;
 
 class DefaultController extends Controller
 {
@@ -14,10 +14,8 @@ class DefaultController extends Controller
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, BenchmarkInterface $benchmark)
     {
-        /* @var $comparator BenchmarkService */
-        $benchmark = $this->get(BenchmarkService::class);
         $showResults = false;
         $form = $this->createForm(WebsiteForm::class, []);
         $form->handleRequest($request);

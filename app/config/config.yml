@@ -77,3 +77,14 @@ monolog:
             type:     stream
             path:     '%kernel.logs_dir%/log.txt'
             channels: benchmark
+            
+httplug:
+    plugins:
+        logger: ~
+    clients:
+        acme:
+            factory: 'httplug.factory.guzzle6'
+            plugins: ['httplug.plugin.logger']
+            config:
+                verify: false
+                timeout: 2

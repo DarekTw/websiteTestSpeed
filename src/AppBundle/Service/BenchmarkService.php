@@ -3,11 +3,14 @@
 namespace AppBundle\Service;
 
 use AppBundle\Model\Website;
+use Http\Client\Common\Plugin\StopwatchPlugin;
+use Http\Client\Common\PluginClient;
+use Http\Discovery\HttpClientDiscovery;
 use Psr\Log\LoggerInterface;
-use Swift_Mailer;
-use Swift_Message;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Http\Message\MessageFactory;
 
-class BenchmarkService
+class BenchmarkService implements BenchmarkInterface
 {
     /**
      * Main website
@@ -22,27 +25,26 @@ class BenchmarkService
     private $competitors;
 
     /**
-     * mailer service
-     * @var Swift_Mailer
-     */
-    private $mailer;
-
-    /**
      * logger service
      * @var LoggerInterface
      */
     private $logger;
 
     /**
-     * templating service
+     * @var MessageFactory
      */
-    private $templating;
+    private $httplug_message_factory;
+    
+    /**
+     * @var MailerInterface
+     */
+    private $mailer;
 
-    public function __construct(Swift_Mailer $mailer, LoggerInterface $logger, $templating)
+    public function __construct(LoggerInterface $logger, MessageFactory $httplug_message_factory, MailerInterface $mailer)
     {
-        $this->mailer = $mailer;
         $this->logger = $logger;
-        $this->templating = $templating;
+        $this->mailer = $mailer;
+        $this->httplug_message_factory = $httplug_message_factory;
         $this->competitors = array();
     }
 
@@ -93,35 +95,18 @@ class BenchmarkService
     {
         $this->logger->info('Benchmark has been started.');
 
-        $this->website->benchmark();
-
-        $this->logger->info("Website: " . $this->website->getDomain() . " | Load time: " . $this->website->getTime() . " s.");
+        $this->benchmarkSingleWebsite($this->website);
 
         foreach ($this->competitors as $cm) {
-            $cm->benchmark();
+            /* @var $cm Website */
+            $this->benchmarkSingleWebsite($cm);
         }
 
         uasort($this->competitors, array(BenchmarkService::class, "compareWebsites"));
 
-        foreach ($this->competitors as $cm) {
-            if ($cm->getError()) {
-                $this->logger->warning("Website competitor: " . $cm->getDomain() . " | " . $cm->getError());
-            } else {
-                $this->logger->info("Website competitor: " . $cm->getDomain() . " | Load time: " . $cm->getTime() . " s. | Difference: " . ($cm->getTime() - $this->website->getTime()) . " s.");
-            }
-        }
-
         // send email
         if ($this->isSlower()) {
-            $message = (new Swift_Message('Website benchmark: tested site is slow'))
-                    ->setBody(
-                    $this->templating->render(
-                            'AppBundle:Emails:slower.html.twig', array('benchmark' => $this)
-                    ), 'text/html'
-                    )
-            ;
-
-            $this->mailer->send($message);
+            $this->mailer->sendWebsiteIsSlowEmail($this);
         }
 
         // send sms
@@ -132,6 +117,20 @@ class BenchmarkService
         $this->logger->info('Benchmark has finished job.');
     }
 
+    protected function benchmarkSingleWebsite(Website $website){
+        $request = $this->httplug_message_factory->createRequest('GET', $website->getDomain());
+        $stopwatch = new Stopwatch();
+        $stopwatchPlugin = new StopwatchPlugin($stopwatch);
+        $pluginClient = new PluginClient(
+                HttpClientDiscovery::find(), [$stopwatchPlugin]
+        );
+        $response = $pluginClient->sendRequest($request);
+        $eventName = "GET ".$website->getDomain();
+        $event = $stopwatch->getEvent($eventName);
+        $this->logger->info(sprintf('Request %s took %s ms and used %s bytes of memory', $eventName, $event->getDuration(), $event->getMemory()));
+        $website->setTime($event->getDuration());
+    }
+    
     /**
      * Compare two websites by load time
      * 
@@ -141,6 +140,17 @@ class BenchmarkService
      */
     static function compareWebsites(Website $a, Website $b)
     {
+
+        // if a is 0 or null a is always greatest
+        if (is_null($a->getTime())) {
+            return 1;
+        }
+
+        // if b is null b is always greatest
+        if (is_null($b->getTime())) {
+            return -1;
+        }
+
         if ($a->getTime() == $b->getTime()) {
             return 0;
         }

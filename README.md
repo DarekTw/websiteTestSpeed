@@ -31,13 +31,13 @@ It is form with website ulr and website competitors as collection field.
 
 src: src/AppBundle/Model/Webiste.php
 It is model of website with domain time and error values.
-This class also has benchmark() method, which checks loading time if website is set, by file_get_contents function.
 
 * Service
 
 src: src/AppBundle/Service/BenchmarkService.php
 It is service which handles benchmark of each website send by a WebisteForm. It also sends an email if a website is loading slow.
-The main function in this service is benchmark(), it calls benchmark() function on each Website and sorts results with compareWebsites() static function.
+The main function in this service is benchmark(), which checks loading time on each Website, by file_get_contents function.
+It also sorts results with compareWebsites() static function.
 
 * Resorces
 
